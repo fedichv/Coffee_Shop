@@ -1,26 +1,48 @@
 import UIKit
 
-class HomeViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
-    
+class HomeViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource {
+    //Отфильтрованные блюда
+    private var filteredDishes: [(image: UIImage?, title: String, price: String, descriptionDishes: String?)] = []
     // MARK: - Данные о блюдах
     private var dishes: [(image: UIImage?, title: String, price: String, descriptionDishes: String?)] = [
-        (UIImage(named: "backgroundImage"), "Паста с соусом", "$15.99","Классическая итальянская паста с насыщенным томатным соусом, свежим базиликом и щедрой порцией пармезана. Это блюдо подарит вам настоящее ощущение итальянского вечера."),
-        (UIImage(named: "backgroundImage"), "Пицца Маргарита", "$12.49","Легендарная пицца с тонким хрустящим тестом, ароматным томатным соусом, свежей моцареллой и базиликом. Идеальный выбор для любителей минимализма и изысканного вкуса."),
-        (UIImage(named: "backgroundImage"), "Салат Цезарь", "$10.99","Хрустящий салат с листьями ромена, нежной курицей на гриле, чесночными крутонами и классической заправкой Цезарь. Сверху посыпан пармезаном для идеального вкусового баланса."),
-        (UIImage(named: "backgroundImage"), "Суп дня", "$7.99","Ароматный суп, приготовленный из свежих ингредиентов сезона. Вкусное и питательное блюдо, которое согреет и подарит энергию на весь день."),
-        (UIImage(named: "backgroundImage"), "Паста с соусом", "$15.99","Классическая итальянская паста с насыщенным томатным соусом, свежим базиликом и щедрой порцией пармезана. Это блюдо подарит вам настоящее ощущение итальянского вечера."),
-        (UIImage(named: "backgroundImage"), "Пицца Маргарита", "$12.49","Легендарная пицца с тонким хрустящим тестом, ароматным томатным соусом, свежей моцареллой и базиликом. Идеальный выбор для любителей минимализма и изысканного вкуса."),
-        (UIImage(named: "backgroundImage"), "Салат Цезарь", "$10.99","Хрустящий салат с листьями ромена, нежной курицей на гриле, чесночными крутонами и классической заправкой Цезарь. Сверху посыпан пармезаном для идеального вкусового баланса."),
-        (UIImage(named: "backgroundImage"), "Суп дня", "$7.99","Ароматный суп, приготовленный из свежих ингредиентов сезона. Вкусное и питательное блюдо, которое согреет и подарит энергию на весь день.")
-       
+        (UIImage(named: "Pasta"), "Паста с соусом", "$15.99", "Классическая итальянская паста с насыщенным томатным соусом, свежим базиликом и щедрой порцией пармезана."),
+        (UIImage(named: "Pizza"), "Пицца Маргарита", "$12.49", "Легендарная пицца с тонким хрустящим тестом."),
+        (UIImage(named: "Salad"), "Салат Цезарь", "$10.99", "Хрустящий салат с курицей на гриле."),
+        (UIImage(named: "Soup"), "Суп дня", "$7.99", "Ароматный суп из свежих ингредиентов."),
+        (UIImage(named: "Pasta"), "Паста с соусом", "$15.99", "Настоящее ощущение итальянского вечера."),
+        (UIImage(named: "Pizza"), "Пицца Маргарита", "$12.49", "Идеальный выбор для любителей минимализма."),
+        (UIImage(named: "Salad"), "Салат Цезарь", "$10.99", "Идеальный баланс вкусов."),
+        (UIImage(named: "Soup"), "Суп дня", "$7.99", "Питательное блюдо для всего дня.")
+    ]
+    
+    // MARK: - Данные о промо-акциях
+    private var promotions: [(image: UIImage?, title: String)] = [
+        (UIImage(named: "Promotion"), "Скидка 20%"),
+        (UIImage(named: "Promotion2"), "1+1 на пиццу"),
+        (UIImage(named: "Promotion3"), "Кофе в подарок"),
+        (UIImage(named: "Promotion4"), "Бесплатная доставка")
     ]
     
     // MARK: - Элементы интерфейса
-    private let tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        tableView.separatorStyle = .none
-        return tableView
+    private let collectionViewPromotion: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 8
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .clear
+        return collectionView
+    }()
+    
+    private let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 16
+        layout.minimumInteritemSpacing = 8
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .white
+        return collectionView
     }()
     
     private let searchField: UITextField = {
@@ -36,7 +58,6 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
     private let filterButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(named: "line.3.horizontal.decrease.circle"), for: .normal)
-        button.setTitleColor(.white, for: .normal)
         button.backgroundColor = UIColor(named: "getStartedColor")
         button.layer.cornerRadius = 10
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -48,20 +69,30 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         super.viewDidLoad()
         view.backgroundColor = .white
         
+        searchField.delegate = self
+        
+        filteredDishes = dishes
+        collectionView.reloadData()
+        
+        // Добавление элементов на экран
         view.addSubview(searchField)
         view.addSubview(filterButton)
-        view.addSubview(tableView)
+        view.addSubview(collectionViewPromotion)
+        view.addSubview(collectionView)
         
+        // Установка констрейнтов
         setupConstraints()
+        let searchText = searchField.text ?? ""
+        search(textDidChange: searchText)
         
-        // Настройка делегатов
-        searchField.delegate = self
-        tableView.delegate = self
-        tableView.dataSource = self
+        // Настройка коллекций
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.register(DishCollectionViewCell.self, forCellWithReuseIdentifier: DishCollectionViewCell.identifier)
         
-        // Регистрация ячейки
-        tableView.register(DishTableViewCell.self, forCellReuseIdentifier: DishTableViewCell.identifier)
-        tableView.allowsSelection = true // Включаем выбор ячеек
+        collectionViewPromotion.delegate = self
+        collectionViewPromotion.dataSource = self
+        collectionViewPromotion.register(PromotionCollectionViewCell.self, forCellWithReuseIdentifier: PromotionCollectionViewCell.identifier)
         
         // Жест для скрытия клавиатуры
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
@@ -69,169 +100,278 @@ class HomeViewController: UIViewController, UITableViewDelegate, UITableViewData
         view.addGestureRecognizer(tapGesture)
     }
     
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return filteredDishes.count
+    }
+
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "DishCell", for: indexPath)
+        let dish = filteredDishes[indexPath.row]
+        cell.textLabel?.text = dish.title
+        cell.detailTextLabel?.text = dish.price
+        cell.imageView?.image = dish.image
+        return cell
+    }
     // MARK: - Настройка констрейнтов
     private func setupConstraints() {
         NSLayoutConstraint.activate([
-            // Поле поиска
             searchField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             searchField.trailingAnchor.constraint(equalTo: filterButton.leadingAnchor, constant: -8),
             searchField.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
             searchField.heightAnchor.constraint(equalToConstant: 40),
             
-            // Кнопка фильтра
             filterButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             filterButton.centerYAnchor.constraint(equalTo: searchField.centerYAnchor),
             filterButton.widthAnchor.constraint(equalTo: searchField.heightAnchor),
             filterButton.heightAnchor.constraint(equalTo: searchField.heightAnchor),
             
-            // Таблица
-            tableView.topAnchor.constraint(equalTo: searchField.bottomAnchor, constant: 16),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionViewPromotion.topAnchor.constraint(equalTo: searchField.bottomAnchor, constant: 16),
+            collectionViewPromotion.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            collectionViewPromotion.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+            collectionViewPromotion.heightAnchor.constraint(equalToConstant: 150),
+            
+            collectionView.topAnchor.constraint(equalTo: collectionViewPromotion.bottomAnchor, constant: 16),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
     
-    // MARK: - Методы UITableViewDataSource
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dishes.count
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let row = dishes[indexPath.row]
-        let detailVC = DetailViewController()
-        // Передача данных в detailVC при необходимости
-        detailVC.dishImage = row.image
-        detailVC.dishTitle = row.title
-        detailVC.dishPrice = row.price
-        detailVC.dishDescription = row.descriptionDishes
-        navigationController?.pushViewController(detailVC, animated: true)
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: DishTableViewCell.identifier, for: indexPath) as? DishTableViewCell else {
-            return UITableViewCell()
+    // MARK: - Методы UICollectionViewDelegateFlowLayout
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if collectionView == collectionViewPromotion {
+            let height = collectionView.frame.height - 16
+            let width = height * 1.5
+            return CGSize(width: width, height: height)
         }
-        let dish = dishes[indexPath.row]
+        let width = (collectionView.frame.width - 16) / 2
+        return CGSize(width: width, height: 250)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == self.collectionView {
+            // Получаем выбранное блюдо из отфильтрованных данных
+            let selectedDish = filteredDishes[indexPath.item]
+            
+            // Создаем экземпляр DetailViewController и передаем данные
+            let detailVC = DetailViewController()
+            detailVC.dishImage = selectedDish.image
+            detailVC.dishTitle = selectedDish.title
+            detailVC.dishPrice = selectedDish.price
+            detailVC.dishDescription = selectedDish.descriptionDishes
+            
+            // Открываем экран с подробной информацией
+            navigationController?.pushViewController(detailVC, animated: true)
+        }
+    }
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if collectionView == collectionViewPromotion {
+            return promotions.count
+        }
+        print("filteredDishes count: \(filteredDishes.count)") // Отладка
+        return filteredDishes.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if collectionView == collectionViewPromotion {
+            guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PromotionCollectionViewCell.identifier, for: indexPath) as? PromotionCollectionViewCell else {
+                return UICollectionViewCell()
+            }
+            let promotion = promotions[indexPath.item]
+            cell.configure(with: promotion.image)
+            return cell
+        }
+
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DishCollectionViewCell.identifier, for: indexPath) as? DishCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+
+        guard indexPath.item < filteredDishes.count else {
+            fatalError("Index out of range: \(indexPath.item) for filteredDishes.count: \(filteredDishes.count)")
+        }
+
+        let dish = filteredDishes[indexPath.item]
         cell.configure(image: dish.image, title: dish.title, price: dish.price)
-        
-        // Устанавливаем обработчик кнопки "Добавить"
         cell.onAddButtonTap = {
-            print("Добавлено: \(dish.title)")
+            print("\(dish.title) добавлено в корзину.")
         }
-        
         return cell
     }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 120 // Высота ячейки
-    }
-    
     // MARK: - Методы для работы с клавиатурой
     @objc private func dismissKeyboard() {
         view.endEditing(true)
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    @objc internal func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true
     }
 }
-class DishTableViewCell: UITableViewCell {
-    static let identifier = "DishTableViewCell"
-    
-    private let dishImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.layer.cornerRadius = 8
-        return imageView
-    }()
-    
-    private let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.boldSystemFont(ofSize: 16)
-        label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let priceLabel: UILabel = {
-        let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14)
-        label.textColor = .darkGray
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private let addToCartButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("Добавить", for: .normal)
-        button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
-        button.backgroundColor = UIColor(named: "getStartedColor")
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 8
-        button.translatesAutoresizingMaskIntoConstraints = false
-        return button
-    }()
-    
-    // Замыкание для обработки нажатия кнопки "Добавить"
-    var onAddButtonTap: (() -> Void)?
-    
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+
+
+// MARK: - Подключение обработки изменений текста
+extension HomeViewController {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let currentText = textField.text ?? ""
+        let updatedText = (currentText as NSString).replacingCharacters(in: range, with: string)
         
-        // Отключаем стиль выделения
-        selectionStyle = .none
-        
-        contentView.addSubview(dishImageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(priceLabel)
-        contentView.addSubview(addToCartButton)
-        setupConstraints()
-        setupActions()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    func configure(image: UIImage?, title: String, price: String) {
-        dishImageView.image = image
-        titleLabel.text = title
-        priceLabel.text = price
-        selectionStyle = .none
-        
-        contentView.backgroundColor = .white
-    }
-    
-    private func setupConstraints() {
-        NSLayoutConstraint.activate([
-            dishImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            dishImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            dishImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-            dishImageView.widthAnchor.constraint(equalToConstant: 100),
-            
-            titleLabel.leadingAnchor.constraint(equalTo: dishImageView.trailingAnchor, constant: 8),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(lessThanOrEqualTo: addToCartButton.leadingAnchor, constant: -8),
-            
-            priceLabel.leadingAnchor.constraint(equalTo: dishImageView.trailingAnchor, constant: 8),
-            priceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            
-            addToCartButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
-            addToCartButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            addToCartButton.widthAnchor.constraint(equalToConstant: 80),
-            addToCartButton.heightAnchor.constraint(equalToConstant: 32)
-        ])
-    }
-    
-    private func setupActions() {
-        addToCartButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
-    }
-    
-    @objc private func addButtonTapped() {
-        onAddButtonTap?()
+        // Обновление фильтрации
+        search(textDidChange: updatedText)
+        return true
     }
 }
+// MARK: - Обновление метода поиска
+extension HomeViewController {
+    func search(textDidChange searchText: String) {
+        if searchText.isEmpty {
+            filteredDishes = dishes
+        } else {
+            filteredDishes = dishes.filter { dish in
+                dish.title.localizedCaseInsensitiveContains(searchText) ||
+                (dish.descriptionDishes?.localizedCaseInsensitiveContains(searchText) ?? false)
+            }
+        }
+        collectionView.reloadData() // Обновление коллекции
+    }
+    
+    // MARK: - Ячейка для UICollectionView
+    class DishCollectionViewCell: UICollectionViewCell {
+        static let identifier = "DishCollectionViewCell"
+        
+        private let dishImageView: UIImageView = {
+            // Изображение блюда
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.layer.cornerRadius = 8 // Скругленные углы
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            return imageView
+        }()
+        
+        private let titleLabel: UILabel = {
+            // Заголовок блюда
+            let label = UILabel()
+            label.font = UIFont.boldSystemFont(ofSize: 16)
+            label.textColor = .black
+            label.translatesAutoresizingMaskIntoConstraints = false
+            return label
+        }()
+        
+        private let priceLabel: UILabel = {
+            // Цена блюда
+            let label = UILabel()
+            label.font = UIFont.systemFont(ofSize: 14)
+            label.textColor = .darkGray
+            label.translatesAutoresizingMaskIntoConstraints = false
+            return label
+        }()
+        
+        private let addToCartButton: UIButton = {
+            // Кнопка добавления
+            let button = UIButton(type: .system)
+            button.setTitle("Добавить", for: .normal)
+            button.titleLabel?.font = UIFont.systemFont(ofSize: 14)
+            button.backgroundColor = UIColor(named: "getStartedColor")
+            button.setTitleColor(.white, for: .normal)
+            button.layer.cornerRadius = 8
+            button.translatesAutoresizingMaskIntoConstraints = false
+            return button
+        }()
+        
+        var onAddButtonTap: (() -> Void)?
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            
+            // Настройка внешнего вида ячейки
+            contentView.backgroundColor = .white
+            contentView.layer.cornerRadius = 8
+            contentView.layer.borderWidth = 1 // Толщина границы
+            contentView.layer.borderColor = UIColor.lightGray.cgColor // Цвет границы
+            
+            // Добавляем элементы в ячейку
+            contentView.addSubview(dishImageView)
+            contentView.addSubview(titleLabel)
+            contentView.addSubview(priceLabel)
+            contentView.addSubview(addToCartButton)
+            
+            // Устанавливаем констрейнты
+            setupConstraints()
+            setupActions()
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        // Настройка ячейки
+        func configure(image: UIImage?, title: String, price: String) {
+            dishImageView.image = image
+            titleLabel.text = title
+            priceLabel.text = price
+        }
+        
+        // Констрейнты элементов
+        private func setupConstraints() {
+            NSLayoutConstraint.activate([
+                dishImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+                dishImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                dishImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+                dishImageView.heightAnchor.constraint(equalTo: contentView.heightAnchor, multiplier: 0.6),
+                
+                titleLabel.topAnchor.constraint(equalTo: dishImageView.bottomAnchor, constant: 8),
+                titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+                titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+                
+                priceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+                priceLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
+                
+                addToCartButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+                addToCartButton.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+                addToCartButton.widthAnchor.constraint(equalToConstant: 80),
+                addToCartButton.heightAnchor.constraint(equalToConstant: 32)
+            ])
+        }
+        
+        // Настройка действий
+        private func setupActions() {
+            addToCartButton.addTarget(self, action: #selector(addButtonTapped), for: .touchUpInside)
+        }
+        
+        @objc private func addButtonTapped() {
+            onAddButtonTap?()
+        }
+    }
+    class PromotionCollectionViewCell: UICollectionViewCell {
+        static let identifier = "PromotionCollectionViewCell"
+        
+        private let imageView: UIImageView = {
+            let imageView = UIImageView()
+            imageView.contentMode = .scaleAspectFill
+            imageView.clipsToBounds = true
+            imageView.layer.cornerRadius = 8
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            return imageView
+        }()
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            contentView.addSubview(imageView)
+            NSLayoutConstraint.activate([
+                imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+                imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+                imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+                imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+            ])
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        func configure(with image: UIImage?) {
+            imageView.image = image
+        }
+    }
+}
+
