@@ -1,5 +1,6 @@
 import UIKit
 
+
 class HomeViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource {
     //Отфильтрованные блюда
     private var filteredDishes: [(image: UIImage?, title: String, price: String, descriptionDishes: String?)] = []
@@ -220,6 +221,8 @@ extension HomeViewController {
         return true
     }
 }
+
+
 // MARK: - Обновление метода поиска
 extension HomeViewController {
     func search(textDidChange searchText: String) {
@@ -233,6 +236,7 @@ extension HomeViewController {
         }
         collectionView.reloadData() // Обновление коллекции
     }
+    
     
     // MARK: - Ячейка для UICollectionView
     class DishCollectionViewCell: UICollectionViewCell {
@@ -342,6 +346,8 @@ extension HomeViewController {
             onAddButtonTap?()
         }
     }
+    
+    
     class PromotionCollectionViewCell: UICollectionViewCell {
         static let identifier = "PromotionCollectionViewCell"
         
