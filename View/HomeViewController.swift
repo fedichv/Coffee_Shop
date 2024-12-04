@@ -1,6 +1,6 @@
 import UIKit
 
-class HomeViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource {
+class HomeViewController: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout, UITextFieldDelegate{
     //Отфильтрованные блюда
     private var filteredDishes: [(image: UIImage?, title: String, price: String, descriptionDishes: String?)] = []
     // MARK: - Данные о блюдах
@@ -9,10 +9,22 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
         (UIImage(named: "Pizza"), "Пицца Маргарита", "$12.49", "Легендарная пицца с тонким хрустящим тестом."),
         (UIImage(named: "Salad"), "Салат Цезарь", "$10.99", "Хрустящий салат с курицей на гриле."),
         (UIImage(named: "Soup"), "Суп дня", "$7.99", "Ароматный суп из свежих ингредиентов."),
-        (UIImage(named: "Pasta"), "Паста с соусом", "$15.99", "Настоящее ощущение итальянского вечера."),
-        (UIImage(named: "Pizza"), "Пицца Маргарита", "$12.49", "Идеальный выбор для любителей минимализма."),
-        (UIImage(named: "Salad"), "Салат Цезарь", "$10.99", "Идеальный баланс вкусов."),
-        (UIImage(named: "Soup"), "Суп дня", "$7.99", "Питательное блюдо для всего дня.")
+        (UIImage(named: "PastaBolognese"), "Паста Болоньезе", "$16.99", "Настоящее ощущение итальянского вечера с густым мясным соусом."),
+        (UIImage(named: "FourCheesePizza"), "Пицца Четыре сыра", "$14.99", "Идеальный выбор для любителей сыра."),
+        (UIImage(named: "GreekSalad"), "Греческий салат", "$11.49", "Свежие овощи с мягким сыром фета и оливковым маслом."),
+        (UIImage(named: "Soup"), "Суп Минестроне", "$8.99", "Лёгкий итальянский овощной суп."),
+        (UIImage(named: "Pasta"), "Паста Карбонара", "$15.49", "Традиционная паста с беконом, яйцом и пармезаном."),
+        (UIImage(named: "Pizza"), "Пицца Пепперони", "$13.99", "Острая пицца с колбасками пепперони."),
+        (UIImage(named: "Salad"), "Салат Нисуаз", "$12.99", "Французский салат с тунцом, яйцом и оливками."),
+        (UIImage(named: "Soup"), "Грибной крем-суп", "$9.99", "Нежный суп с лесными грибами и сливками."),
+        (UIImage(named: "Pasta"), "Паста Альфредо", "$15.99", "Кремовая паста с курицей и грибами."),
+        (UIImage(named: "Pizza"), "Пицца Гавайская", "$12.99", "Сочная пицца с ананасами и ветчиной."),
+        (UIImage(named: "Salad"), "Салат с рукколой", "$10.49", "Свежая руккола с томатами и сыром пармезан."),
+        (UIImage(named: "Soup"), "Томатный суп", "$7.49", "Суп с томатами и ароматными травами."),
+        (UIImage(named: "Pasta"), "Равиоли с рикоттой", "$16.49", "Ручной работы равиоли с рикоттой и шпинатом."),
+        (UIImage(named: "Pizza"), "Пицца Диабло", "$14.49", "Острая пицца с острым соусом и колбасками."),
+        (UIImage(named: "Salad"), "Салат с лососем", "$13.49", "Салат с кусочками слабосолёного лосося и свежими овощами."),
+        (UIImage(named: "Soup"), "Куриный суп", "$6.99", "Традиционный куриный суп с домашними овощами.")
     ]
     
     // MARK: - Данные о промо-акциях
@@ -24,21 +36,10 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
     ]
     
     // MARK: - Элементы интерфейса
-    private let collectionViewPromotion: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .horizontal
-        layout.minimumLineSpacing = 8
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.backgroundColor = .clear
-        return collectionView
-    }()
-    
     private let collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 16
-        layout.minimumInteritemSpacing = 8
+        let layout = UICollectionViewCompositionalLayout { sectionIndex, environment in
+            return HomeViewController.createSectionLayout(sectionIndex: sectionIndex)
+        }
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .white
@@ -77,7 +78,6 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
         // Добавление элементов на экран
         view.addSubview(searchField)
         view.addSubview(filterButton)
-        view.addSubview(collectionViewPromotion)
         view.addSubview(collectionView)
         
         // Установка констрейнтов
@@ -89,10 +89,7 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(DishCollectionViewCell.self, forCellWithReuseIdentifier: DishCollectionViewCell.identifier)
-        
-        collectionViewPromotion.delegate = self
-        collectionViewPromotion.dataSource = self
-        collectionViewPromotion.register(PromotionCollectionViewCell.self, forCellWithReuseIdentifier: PromotionCollectionViewCell.identifier)
+        collectionView.register(PromotionCollectionViewCell.self, forCellWithReuseIdentifier: PromotionCollectionViewCell.identifier)
         
         // Жест для скрытия клавиатуры
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
@@ -100,18 +97,6 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
         view.addGestureRecognizer(tapGesture)
     }
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return filteredDishes.count
-    }
-
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "DishCell", for: indexPath)
-        let dish = filteredDishes[indexPath.row]
-        cell.textLabel?.text = dish.title
-        cell.detailTextLabel?.text = dish.price
-        cell.imageView?.image = dish.image
-        return cell
-    }
     // MARK: - Настройка констрейнтов
     private func setupConstraints() {
         NSLayoutConstraint.activate([
@@ -125,55 +110,76 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
             filterButton.widthAnchor.constraint(equalTo: searchField.heightAnchor),
             filterButton.heightAnchor.constraint(equalTo: searchField.heightAnchor),
             
-            collectionViewPromotion.topAnchor.constraint(equalTo: searchField.bottomAnchor, constant: 16),
-            collectionViewPromotion.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
-            collectionViewPromotion.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
-            collectionViewPromotion.heightAnchor.constraint(equalToConstant: 150),
-            
-            collectionView.topAnchor.constraint(equalTo: collectionViewPromotion.bottomAnchor, constant: 16),
+            collectionView.topAnchor.constraint(equalTo: searchField.bottomAnchor, constant: 16),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
     
-    // MARK: - Методы UICollectionViewDelegateFlowLayout
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if collectionView == collectionViewPromotion {
-            let height = collectionView.frame.height - 16
-            let width = height * 1.5
-            return CGSize(width: width, height: height)
-        }
-        let width = (collectionView.frame.width - 16) / 2
-        return CGSize(width: width, height: 250)
-    }
-    
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        if collectionView == self.collectionView {
-            // Получаем выбранное блюдо из отфильтрованных данных
+        if indexPath.section == 0 {
+            // Ничего не делаем для секции 0 (промо-акции)
+            return
+        } else if indexPath.section == 1 {
+            // Обрабатываем переход только для блюд
             let selectedDish = filteredDishes[indexPath.item]
             
-            // Создаем экземпляр DetailViewController и передаем данные
             let detailVC = DetailViewController()
             detailVC.dishImage = selectedDish.image
             detailVC.dishTitle = selectedDish.title
             detailVC.dishPrice = selectedDish.price
             detailVC.dishDescription = selectedDish.descriptionDishes
             
-            // Открываем экран с подробной информацией
             navigationController?.pushViewController(detailVC, animated: true)
         }
     }
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 2 // 0 — Промо, 1 — Блюда
+    }
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        if collectionView == collectionViewPromotion {
-            return promotions.count
+        switch section {
+        case 0: return promotions.count // Промо-акции
+        case 1: return filteredDishes.count // Блюда
+        default: return 0
         }
-        print("filteredDishes count: \(filteredDishes.count)") // Отладка
-        return filteredDishes.count
+    }
+    
+    private static func createSectionLayout(sectionIndex: Int) -> NSCollectionLayoutSection {
+        switch sectionIndex {
+        case 0: // Промо-акции (горизонтальный скролл)
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(150))
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 2, leading: 2, bottom: 2, trailing: 2)
+            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .absolute(150))
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+            group.interItemSpacing = .fixed(4)
+            let section = NSCollectionLayoutSection(group: group)
+            section.orthogonalScrollingBehavior = .continuous
+            section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 4, bottom: 8, trailing: 4)
+            return section
+            
+        case 1: // Блюда (вертикальный скролл)
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(0.5), heightDimension: .absolute(250))
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            item.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8)
+            
+            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(260))
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+            
+            let section = NSCollectionLayoutSection(group: group)
+            return section
+            
+        default:
+            return NSCollectionLayoutSection(group: NSCollectionLayoutGroup(layoutSize: NSCollectionLayoutSize(
+                widthDimension: .fractionalWidth(1.0),
+                heightDimension: .fractionalHeight(1.0))))
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        if collectionView == collectionViewPromotion {
+        if indexPath.section == 0 { // Промо-акции
             guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PromotionCollectionViewCell.identifier, for: indexPath) as? PromotionCollectionViewCell else {
                 return UICollectionViewCell()
             }
@@ -181,20 +187,13 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
             cell.configure(with: promotion.image)
             return cell
         }
-
+        
+        // Блюда
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: DishCollectionViewCell.identifier, for: indexPath) as? DishCollectionViewCell else {
             return UICollectionViewCell()
         }
-
-        guard indexPath.item < filteredDishes.count else {
-            fatalError("Index out of range: \(indexPath.item) for filteredDishes.count: \(filteredDishes.count)")
-        }
-
         let dish = filteredDishes[indexPath.item]
         cell.configure(image: dish.image, title: dish.title, price: dish.price)
-        cell.onAddButtonTap = {
-            print("\(dish.title) добавлено в корзину.")
-        }
         return cell
     }
     // MARK: - Методы для работы с клавиатурой
@@ -344,11 +343,10 @@ extension HomeViewController {
     }
     class PromotionCollectionViewCell: UICollectionViewCell {
         static let identifier = "PromotionCollectionViewCell"
-        
         private let imageView: UIImageView = {
             let imageView = UIImageView()
-            imageView.contentMode = .scaleAspectFill
-            imageView.clipsToBounds = true
+            imageView.contentMode = .scaleAspectFill // подгоняят под размер
+            imageView.clipsToBounds = true // Отключить обрезание
             imageView.layer.cornerRadius = 8
             imageView.translatesAutoresizingMaskIntoConstraints = false
             return imageView
@@ -358,10 +356,10 @@ extension HomeViewController {
             super.init(frame: frame)
             contentView.addSubview(imageView)
             NSLayoutConstraint.activate([
-                imageView.topAnchor.constraint(equalTo: contentView.topAnchor),
-                imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
-                imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+                imageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),      // Отступ сверху
+                imageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8), // Отступ слева
+                imageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8), // Отступ справа
+                imageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8)  // Отступ снизу
             ])
         }
         
@@ -374,4 +372,3 @@ extension HomeViewController {
         }
     }
 }
-
