@@ -16,6 +16,7 @@
 		0ABA86CF2CF620E700625B7D /* RoundedTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABA86CE2CF620C600625B7D /* RoundedTabBar.swift */; };
 		0ABA86D12CF625AE00625B7D /* DetailViewContriller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABA86D02CF625A000625B7D /* DetailViewContriller.swift */; };
 		0ABA873F2CFF5FD100625B7D /* BaseViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABA873E2CFF5FBD00625B7D /* BaseViewController.swift */; };
+		0ABA89B32D08B36900625B7D /* FilterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ABA89B22D08B35800625B7D /* FilterView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +30,7 @@
 		0ABA86CE2CF620C600625B7D /* RoundedTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoundedTabBar.swift; sourceTree = "<group>"; };
 		0ABA86D02CF625A000625B7D /* DetailViewContriller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewContriller.swift; sourceTree = "<group>"; };
 		0ABA873E2CFF5FBD00625B7D /* BaseViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseViewController.swift; sourceTree = "<group>"; };
+		0ABA89B22D08B35800625B7D /* FilterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -99,6 +101,7 @@
 		0ABA86752CF3988800625B7D /* View */ = {
 			isa = PBXGroup;
 			children = (
+				0ABA89B22D08B35800625B7D /* FilterView.swift */,
 				0ABA873E2CFF5FBD00625B7D /* BaseViewController.swift */,
 				0ABA86572CF35AA100625B7D /* ViewController.swift */,
 				0ABA86732CF390CC00625B7D /* HomeViewController.swift */,
@@ -195,6 +198,7 @@
 				0ABA873F2CFF5FD100625B7D /* BaseViewController.swift in Sources */,
 				0ABA86742CF390D400625B7D /* HomeViewController.swift in Sources */,
 				0ABA86542CF35AA100625B7D /* AppDelegate.swift in Sources */,
+				0ABA89B32D08B36900625B7D /* FilterView.swift in Sources */,
 				0ABA86562CF35AA100625B7D /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

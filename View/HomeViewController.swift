@@ -69,6 +69,7 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
         super.viewDidLoad()
         view.backgroundColor = .white
         
+        
         searchField.delegate = self
         
         filteredDishes = dishes
@@ -89,6 +90,8 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
         collectionView.dataSource = self
         collectionView.register(DishCollectionViewCell.self, forCellWithReuseIdentifier: DishCollectionViewCell.identifier)
         collectionView.register(PromotionCollectionViewCell.self, forCellWithReuseIdentifier: PromotionCollectionViewCell.identifier)
+        
+        filterButton.addTarget(self, action: #selector(filterButtonTapped) , for: .touchUpInside)
         
         // Жест для скрытия клавиатуры
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
@@ -115,6 +118,19 @@ class HomeViewController: UIViewController, UICollectionViewDelegate, UICollecti
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
+    
+    @objc func filterButtonTapped() {
+        let filterVC = FilterView()
+        if let sheet = filterVC.sheetPresentationController {
+            sheet.detents = [.medium(),.large()] // Указываем, что окно может занимать средний или большой размер
+            sheet.prefersGrabberVisible = true   // Отображаем индикатор для свайпа
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = true // Позволяем листу расширяться при прокрутке
+        }
+        
+        // Показываем контроллер
+        present(filterVC, animated: true, completion: nil)
+    }
+
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if indexPath.section == 0 {
