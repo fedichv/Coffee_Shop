@@ -1,32 +1,37 @@
 import UIKit
 
 class RoundedTabBar: UITabBar {
-    private var customBackgroundLayer: CAShapeLayer!
+    private var customBackgroundLayer: CAShapeLayer?
 
-    override func draw(_ rect: CGRect) {
-        super.draw(rect)
+    override func layoutSubviews() {
+        super.layoutSubviews()
 
+        // Удаляем старый слой, если он уже существует
         customBackgroundLayer?.removeFromSuperlayer()
 
+        // Определяем кастомный прямоугольник
         let customRect = CGRect(
             x: bounds.minX + 10,
             y: bounds.minY - 20,
             width: bounds.width - 20,
-            height: bounds.height - 10
+            height: bounds.height + 20 // Увеличиваем, чтобы компенсировать высоту
         )
 
+        // Создаём новый слой с закруглёнными углами
         let layerPath = UIBezierPath(
             roundedRect: customRect,
             cornerRadius: 24
         )
-        customBackgroundLayer = CAShapeLayer()
-        customBackgroundLayer.path = layerPath.cgPath
-        customBackgroundLayer.fillColor = UIColor.white.cgColor
-        customBackgroundLayer.shadowColor = UIColor.black.cgColor
-        customBackgroundLayer.shadowOpacity = 0.1
-        customBackgroundLayer.shadowOffset = CGSize(width: 0, height: 4)
-        customBackgroundLayer.shadowRadius = 10
+        let newBackgroundLayer = CAShapeLayer()
+        newBackgroundLayer.path = layerPath.cgPath
+        newBackgroundLayer.fillColor = UIColor.white.cgColor
+        newBackgroundLayer.shadowColor = UIColor.black.cgColor
+        newBackgroundLayer.shadowOpacity = 0.1
+        newBackgroundLayer.shadowOffset = CGSize(width: 0, height: 4)
+        newBackgroundLayer.shadowRadius = 10
 
-        layer.insertSublayer(customBackgroundLayer, at: 0)
+        // Добавляем слой под все другие слои
+        layer.insertSublayer(newBackgroundLayer, at: 0)
+        customBackgroundLayer = newBackgroundLayer
     }
 }

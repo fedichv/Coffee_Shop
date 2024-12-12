@@ -3,7 +3,6 @@ import UIKit
 class ViewController: UIViewController {
     
     // MARK: - UI Elements
-    
     private let backgroundImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
