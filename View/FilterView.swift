@@ -3,7 +3,7 @@ import UIKit
 class FilterView: UIViewController,UITableViewDataSource, UITableViewDelegate {
     
     private let tableView = UITableView()
-    private let options = ["Опция 1", "Опция 2", "Опция 3", "Опция 4"]
+    private let options = ["Паста", "Суп", "Пицца", "Салат"]
     private var selectedOptionIndex: Int? // Индекс выбранной опции
     
     override func viewDidLoad() {
